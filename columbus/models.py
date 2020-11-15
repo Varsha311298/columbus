@@ -37,6 +37,7 @@ class HttpResponse:
 
 class HttpRequest:
     def __init__(self, method: HTTPMethod, path, params: Mapping[str, Union[List[str], str]], body=None, headers=None,
+                 mime_type=None,
                  context=None):
         self.method = method
         self.path = path
@@ -44,6 +45,7 @@ class HttpRequest:
         self.body = body
         self.headers = headers
         self.context = context
+        self.mime_type = mime_type
 
         self.lambda_context = None
 

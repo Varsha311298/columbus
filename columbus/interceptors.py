@@ -43,8 +43,7 @@ class CORSInterceptor(Interceptor):
             raise MethodNotAllowed('%s method not allowed' % request.get_method())
 
     def on_response(self, request: HttpRequest, response: HttpResponse):
-
-        response.add_headers(self.headers)
+        response.headers.update(self.headers)
 
 
 class LogInterceptor(Interceptor):

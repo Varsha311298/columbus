@@ -12,6 +12,12 @@ class HttpRequestParser(ABC):
         pass
 
 
+class AWSHttpParser(HttpRequestParser, ABC):
+
+    def parse_request(self, raw_request) -> HttpRequest:
+        pass
+
+
 class LambdaRequestParser:
     def __init__(self, event):
         self.event = event
