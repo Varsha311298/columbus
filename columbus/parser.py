@@ -93,6 +93,28 @@ class AWSHttpParser(HttpRequestParser, ABC):
             return result
         return None
 
+class AzureHttpParser(HttpRequestParser, ABC):
+    def __init__(self, context: func.HttpRequest):
+        super().__init__(context)
+
+    def get_method(self):
+        return HTTPMethod[self.context.method()]
+
+    def get_path(self):
+        return self.context.url()
+
+    def get_params(self):
+        return self.context.params()
+
+    def get_body(self):
+        return self.context.get_json()
+
+    def get_headers(self):
+        return self.context.headers
+
+    def get_mimetype(self):
+        return self.context.headers.get('Content-Type', '')
+
 
 
 class LambdaRequestParser:
