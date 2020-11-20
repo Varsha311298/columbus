@@ -25,3 +25,9 @@ class Authorizer:
             return 'Signature expired. Login please'
         except jwt.InvalidTokenError:
             return 'Invalid token. Login please'
+    def on_request(self, request: HttpRequest):
+        if not self.__is_valid_request(request):
+            raise MethodNotAllowed('%s method not allowed' % request.get_method())
+
+    def on_response(self, request: HttpRequest, response: HttpResponse):
+        response.headers.update(self.headers)
