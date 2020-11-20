@@ -77,7 +77,7 @@ class Router:
                 response = HttpResponse(body=e.msg, status=e.status)
 
             except Exception as e:
-                response = HttpResponse(body=str(e), status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                response = HttpResponse(body=str(e))
 
             return response.as_dict()
 

@@ -50,7 +50,10 @@ class LogInterceptor(Interceptor):
     def __init__(self, logger: Logger):
         self.log = logger
 
-    def filter(self, event, response):
-        request = LambdaRequestParser(event).get_request()
+    def on_request(self, request: HttpRequest):
         self.log.info(
             '{}: {}  Params: {}'.format(request.get_method(), request.get_path(), str(request.get_all_params())))
+
+    def on_response(self, request: HttpRequest, response: HttpResponse):
+        pass
+
