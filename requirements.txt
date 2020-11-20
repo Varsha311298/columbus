@@ -1,1 +1,2 @@
 werkzeug
+PyJWT~=1.7.1

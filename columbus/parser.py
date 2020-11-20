@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from urllib.parse import parse_qs
 from columbus.models import HTTPMethod, HttpRequest
 from columbus.structures import CaseInsensitiveDict
+import azure.functions as func
 
 
 class HttpRequestParser(ABC):
@@ -93,6 +94,7 @@ class AWSHttpParser(HttpRequestParser, ABC):
             return result
         return None
 
+
 class AzureHttpParser(HttpRequestParser, ABC):
     def __init__(self, context: func.HttpRequest):
         super().__init__(context)
@@ -115,6 +117,80 @@ class AzureHttpParser(HttpRequestParser, ABC):
     def get_mimetype(self):
         return self.context.headers.get('Content-Type', '')
 
+
+class HTTPResponseParser(ABC):
+
+    @abstractmethod
+    def get_body(self):
+        pass
+
+    @abstractmethod
+    def get_status(self):
+        pass
+
+    @abstractmethod
+    def get_mimetype(self):
+        pass
+
+    @abstractmethod
+    def get_headers(self):
+        pass
+
+    @abstractmethod
+    def get_charset(self):
+        pass
+
+    def parse_response(self) -> HttpResponse:
+        return HttpResponse(self.get_body(), self.get_status(), self.get_headers(), self.get_mimetype(),
+                            self.get_charset())
+
+
+class AWSResponseParser(HTTPResponseParser, ABC):
+    def __init__(self, body=None, headers={}):
+        self.body = body
+        self.headers = headers
+        self.status = HTTPStatus.OK
+
+    def get_body(self):
+        return self.body
+
+    def get_headers(self):
+        return self.headers
+
+    def add_headers(self, headers):
+        self.headers.update(headers)
+
+    def get_status(self):
+        return HTTPStatus.OK
+
+    def get_mimetype(self):
+        return 'application/json'
+
+    def get_charset(self):
+        return None
+
+
+class AzureResponseParser(HTTPResponseParser, ABC):
+    def __init__(self, req: func.HttpResponse):
+        self.req = req
+
+    def get_body(self):
+        return self.req.get_body
+
+    def get_headers(self):
+        return self.req.headers
+
+    def get_status(self):
+        return self.req.status_code
+
+    def get_mimetype(self):
+        return self.req.mimetype
+
+    def get_charset(self):
+        return self.req.charset
+
+    def parse_response(self) -> func.HttpResponse:
+        return func.HttpResponse(self.get_body())
 
 
 class LambdaRequestParser:
