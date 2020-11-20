@@ -34,6 +34,21 @@ class HttpResponse:
     def __repr__(self):
         return self.__str__()
 
+    def add_headers(self, headers):
+        self.headers = headers
+
+    def set_body(self, body):
+        self.body = body
+
+    def set_status(self, status: HTTPStatus):
+        self.status = status
+
+    def as_dict(self):
+        return {
+            'statusCode': self.status,
+            'body': self.body,
+            'headers': self.headers
+        }
 
 class HttpRequest:
     def __init__(self, method: HTTPMethod, path, params: Mapping[str, Union[List[str], str]], body=None, headers=None,
@@ -64,6 +79,9 @@ class HttpRequest:
         else:
             val = values[0] if isinstance(values, List) else values
         return val
+
+    def get_all_params(self):
+        return self.params
 
     def get_body(self):
         return self.body
