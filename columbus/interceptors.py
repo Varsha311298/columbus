@@ -18,7 +18,34 @@ class Interceptor(ABC):
         pass
 
 
-class CORSInterceptor(Interceptor):
+class AuthInterceptor(Interceptor, ABC):
+    def __init__(self, secret, bearer):
+        self.authorizer = Authorizer(secret, bearer)
+
+    def __verify_bearer_and_token(self, token):
+        decoded_data = self.authorizer.decode_auth(token)
+        if isinstance(decoded_data, str):
+            raise Exception(decoded_data)
+        return decoded_data
+
+    def on_request(self, request: HttpRequest):
+        auth_token = request.get_header('Authorization')
+
+        bearer, token = auth_token.split(' ')
+        if self.authorizer.bearer != bearer:
+            raise Exception('ERROR ::: BEARER doesnt match')
+
+    def on_response(self, request: HttpRequest, response: HttpResponse):
+        auth_token = request.get_header('Authorization')
+        try:
+            bearer, token = auth_token.split(' ')
+            decoded = self.__verify_bearer_and_token(token)
+            return 'userinfo', decoded
+        except Exception as e:
+            raise Exception('Error while decoding auth')
+
+
+class CORSInterceptor(Interceptor, ABC):
 
     def __init__(
             self,
@@ -53,3 +80,5 @@ class LogInterceptor(Interceptor, ABC):
     def on_request(self, request: HttpRequest):
         self.log.info(
             '{}: {}  Params: {}'.format(request.get_method(), request.get_path(), str(request.get_all_params())))
+    def on_response(self, request: HttpRequest, response: HttpResponse):
+        pass
