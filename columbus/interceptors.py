@@ -46,14 +46,10 @@ class CORSInterceptor(Interceptor):
         response.headers.update(self.headers)
 
 
-class LogInterceptor(Interceptor):
-    def __init__(self, logger: Logger):
+class LogInterceptor(Interceptor, ABC):
+    def _init_(self, logger: Logger):
         self.log = logger
 
     def on_request(self, request: HttpRequest):
         self.log.info(
             '{}: {}  Params: {}'.format(request.get_method(), request.get_path(), str(request.get_all_params())))
-
-    def on_response(self, request: HttpRequest, response: HttpResponse):
-        pass
-
